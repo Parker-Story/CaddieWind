@@ -1,0 +1,23 @@
+# Claude
+.claude/
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+DerivedData/
+*.hmap
+
+# Build
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Swift Package Manager
+.swiftpm/
+Packages/

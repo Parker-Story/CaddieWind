@@ -1,0 +1,35 @@
+name: CaddieWind
+options:
+  bundleIdPrefix: com.caddiewind
+  deploymentTarget:
+    iOS: "15.0"
+  xcodeVersion: "15.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    GENERATE_INFOPLIST_FILE: YES
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  CaddieWind:
+    type: application
+    platform: iOS
+    sources:
+      - path: CaddieWind
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        INFOPLIST_FILE: CaddieWind/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.caddiewind.app
+        INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "CaddieWind needs your location to show wind conditions for your golf game."
+        INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription: "CaddieWind needs your location to show wind conditions for your golf game."
+        INFOPLIST_KEY_CFBundleDisplayName: "CaddieWind"
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
