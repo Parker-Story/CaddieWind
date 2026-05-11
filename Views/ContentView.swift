@@ -48,7 +48,8 @@ struct ContentView: View {
                     } else if weatherService.windSpeed > 0 || weatherService.windDirection > 0 {
                         CompassView(
                             windDirection: weatherService.windDirection,
-                            windSpeed: weatherService.windSpeed
+                            windSpeed: weatherService.windSpeed,
+                            heading: weatherService.heading
                         )
                     } else {
                         VStack(spacing: 20) {

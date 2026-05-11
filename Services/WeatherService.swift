@@ -8,6 +8,10 @@ class WeatherService: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
 
+    /// Device heading in degrees clockwise from true north (0...360).
+    /// 0 = user pointing the top of their phone at true north.
+    @Published var heading: Double = 0
+
     private let locationManager = CLLocationManager()
     private let apiKey = Config.openWeatherMapAPIKey
 
@@ -15,6 +19,10 @@ class WeatherService: NSObject, ObservableObject, CLLocationManagerDelegate {
         super.init()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        // Update heading on every 1° change for smooth compass rotation
+        locationManager.headingFilter = 1
+        // Treat the top of the device as "forward" for heading
+        locationManager.headingOrientation = .portrait
     }
 
     func requestLocation() {
@@ -25,6 +33,7 @@ class WeatherService: NSObject, ObservableObject, CLLocationManagerDelegate {
             locationManager.requestWhenInUseAuthorization()
         case .authorizedWhenInUse, .authorizedAlways:
             locationManager.requestLocation()
+            startHeadingUpdatesIfAvailable()
         case .denied, .restricted:
             errorMessage = "Location access denied. Please enable in Settings."
         @unknown default:
@@ -32,21 +41,46 @@ class WeatherService: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
     }
 
-    // CLLocationManagerDelegate methods
+    private func startHeadingUpdatesIfAvailable() {
+        if CLLocationManager.headingAvailable() {
+            locationManager.startUpdatingHeading()
+        }
+    }
+
+    deinit {
+        locationManager.stopUpdatingHeading()
+    }
+
+    // MARK: - CLLocationManagerDelegate
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         fetchWeather(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        // Heading errors also land here; don't clobber UI with transient heading failures
+        let nsError = error as NSError
+        if nsError.domain == kCLErrorDomain && nsError.code == CLError.headingFailure.rawValue {
+            return
+        }
         errorMessage = "Failed to get location: \(error.localizedDescription)"
         isLoading = false
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        // trueHeading is -1 when unavailable (e.g. location services off); fall back to magnetic.
+        let value = newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading
+        // Only accept reasonably accurate readings (headingAccuracy < 0 means invalid)
+        guard newHeading.headingAccuracy >= 0 else { return }
+        heading = value
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
         if status == .authorizedWhenInUse || status == .authorizedAlways {
             manager.requestLocation()
+            startHeadingUpdatesIfAvailable()
         }
     }
 
