@@ -6,56 +6,50 @@ struct CompassView: View {
 
     var body: some View {
         ZStack {
-            // Background circle
+            // Outer thin ring
             Circle()
-                .fill(
-                    RadialGradient(
-                        gradient: Gradient(colors: [Color.white, Color.gray.opacity(0.1)]),
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: 150
-                    )
-                )
+                .stroke(Color.white.opacity(0.08), lineWidth: 1)
                 .frame(width: 300, height: 300)
-                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
 
-            // Compass ring with cardinal directions
+            // Inner ring
             Circle()
-                .stroke(Color.gray.opacity(0.3), lineWidth: 2)
-                .frame(width: 280, height: 280)
+                .stroke(Color.white.opacity(0.15), lineWidth: 1)
+                .frame(width: 230, height: 230)
+
+            // Degree tick marks (every 15 degrees)
+            ForEach(Array(stride(from: 0, to: 360, by: 15)), id: \.self) { degree in
+                Rectangle()
+                    .fill(Color.white.opacity(degree % 90 == 0 ? 0.9 : (degree % 45 == 0 ? 0.5 : 0.25)))
+                    .frame(
+                        width: degree % 90 == 0 ? 2 : 1,
+                        height: degree % 90 == 0 ? 14 : (degree % 45 == 0 ? 10 : 6)
+                    )
+                    .offset(y: -143)
+                    .rotationEffect(.degrees(Double(degree)))
+            }
 
             // Cardinal direction labels
             ForEach(["N", "E", "S", "W"], id: \.self) { direction in
                 Text(direction)
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(.black)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundColor(direction == "N" ? .white : .white.opacity(0.6))
                     .position(cardinalPosition(for: direction))
-            }
-
-            // Degree markers (every 30 degrees)
-            ForEach(Array(stride(from: 0, to: 360, by: 30)), id: \.self) { degree in
-                Rectangle()
-                    .fill(Color.gray.opacity(0.5))
-                    .frame(width: 2, height: degree % 90 == 0 ? 15 : 8)
-                    .offset(y: -130)
-                    .rotationEffect(.degrees(Double(degree)))
             }
 
             // Wind direction indicator (arrow)
             WindArrow(direction: windDirection)
                 .frame(width: 200, height: 200)
 
-            // Center circle
+            // Center dot
             Circle()
-                .fill(Color.green)
-                .frame(width: 20, height: 20)
-                .shadow(radius: 3)
+                .fill(Color.white)
+                .frame(width: 6, height: 6)
         }
-        .rotationEffect(.degrees(-windDirection))
+        .frame(width: 300, height: 300)
     }
 
     private func cardinalPosition(for direction: String) -> CGPoint {
-        let radius: CGFloat = 115
+        let radius: CGFloat = 128
         let center = CGPoint(x: 150, y: 150)
 
         let angle: Double
@@ -79,23 +73,50 @@ struct WindArrow: View {
     let direction: Double
 
     var body: some View {
-        ZStack {
-            // Arrow pointing in wind direction
-            Image(systemName: "location.north.fill")
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(.blue)
-                .rotationEffect(.degrees(180)) // Point opposite of where wind comes from
-                .frame(width: 60, height: 60)
+        // Slim arrow pointing in the direction the wind is blowing TOWARD
+        // (wind `direction` is the bearing the wind comes FROM, so rotate +180)
+        ArrowShape()
+            .fill(
+                LinearGradient(
+                    colors: [Color.cyan, Color.blue],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+            .frame(width: 18, height: 110)
+            .rotationEffect(.degrees(direction + 180))
+    }
+}
 
-            // Wind "blowing from" indicator
-            Circle()
-                .stroke(Color.blue.opacity(0.3), lineWidth: 3)
-                .frame(width: 250, height: 250)
-        }
+/// A slim, tapered arrow pointing up by default.
+struct ArrowShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let w = rect.width
+        let h = rect.height
+
+        // Tip
+        path.move(to: CGPoint(x: w / 2, y: 0))
+        // Right shoulder
+        path.addLine(to: CGPoint(x: w, y: h * 0.35))
+        // Right notch
+        path.addLine(to: CGPoint(x: w * 0.62, y: h * 0.35))
+        // Right tail
+        path.addLine(to: CGPoint(x: w * 0.62, y: h))
+        // Left tail
+        path.addLine(to: CGPoint(x: w * 0.38, y: h))
+        // Left notch
+        path.addLine(to: CGPoint(x: w * 0.38, y: h * 0.35))
+        // Left shoulder
+        path.addLine(to: CGPoint(x: 0, y: h * 0.35))
+        path.closeSubpath()
+        return path
     }
 }
 
 #Preview {
-    CompassView(windDirection: 45, windSpeed: 10)
+    ZStack {
+        Color.black.ignoresSafeArea()
+        CompassView(windDirection: 45, windSpeed: 10)
+    }
 }
