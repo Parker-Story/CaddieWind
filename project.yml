@@ -17,12 +17,15 @@ targets:
     type: application
     platform: iOS
     sources:
-      - path: CaddieWind
-        excludes:
-          - "**/.DS_Store"
+      - path: App
+      - path: Models
+      - path: Services
+      - path: Views
+      - path: Resources
+      - path: Config.swift
+        optional: true
     settings:
       base:
-        INFOPLIST_FILE: CaddieWind/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: com.caddiewind.app
         INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "CaddieWind needs your location to show wind conditions for your golf game."
         INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription: "CaddieWind needs your location to show wind conditions for your golf game."

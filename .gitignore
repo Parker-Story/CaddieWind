@@ -21,3 +21,6 @@ Thumbs.db
 # Swift Package Manager
 .swiftpm/
 Packages/
+
+# Secrets — real API keys live here, never commit
+/Config.swift
