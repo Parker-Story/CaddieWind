@@ -2,9 +2,7 @@
 
 > A lightweight iOS compass that shows real-time wind direction and speed for golfers.
 
-![CaddieWind screenshot or screen recording placeholder](docs/screenshot-placeholder.png)
-
-*(Replace the image above with an actual screenshot or GIF once you have one. Tip: on macOS, press `Cmd + Shift + 5` to record a screen segment, then drag the `.mov` into the GitHub README editor and it'll auto-convert to a GIF.)*
+https://github.com/user-attachments/assets/027941eb-6a17-4c80-a2d3-96abf4fe8c69
 
 ---
 
@@ -14,8 +12,8 @@ CaddieWind fetches live weather data for your current GPS location and overlays 
 
 - **Wind speed** in mph
 - **Wind direction** relative to where you're aiming
-- **"Plays Like" yardage** — an adjusted distance that accounts for headwind, tailwind, and crosswind drift
-- **Drift estimate** — how many yards left or right the wind will push the ball
+- **"Plays Like" yardage** - an adjusted distance that accounts for headwind, tailwind, and crosswind drift
+- **Drift estimate** - how many yards left or right the wind will push the ball
 
 You can also switch to a **manual wind direction mode** if you want to plan a shot without pointing the phone, or if the compass heading is unreliable.
 
@@ -32,20 +30,18 @@ You can also switch to a **manual wind direction mode** if you want to plan a sh
 | **Project Management** | XcodeGen (`project.yml`) | Keeps the `.xcodeproj` file out of meaningful diffs. Adding new Swift files is just a filesystem operation; regenerating the project is one command. This avoids merge conflicts in Xcode's opaque project bundle. |
 | **Architecture** | MVCL (lightweight) | Kept it simple: models → service → views. No external dependency injection framework needed for an app this size. |
 
-*(Feel free to customize the reasoning above to match your actual evaluation process.)*
-
 ---
 
 ## Solving the Magnetic Declination Problem
 
 One of the trickiest parts of building an accurate compass is **true north vs. magnetic north**. iOS exposes both values via `CLHeading`:
 
-- `trueHeading` — points to geographic north (what you want for aligning with wind data from a weather API)
-- `magneticHeading` — points to magnetic north (varies by location and shifts over time)
+- `trueHeading` - points to geographic north (what you want for aligning with wind data from a weather API)
+- `magneticHeading` - points to magnetic north (varies by location and shifts over time)
 
 The catch: `trueHeading` returns `-1` when location services are disabled or unavailable, which would silently break the compass. CaddieWind handles this by **falling back to `magneticHeading`** when true heading is invalid, and it filters out readings with negative `headingAccuracy` so the user never sees a wild, incorrect rotation.
 
-This small detail matters because wind data from OpenWeatherMap is relative to true north. If the compass showed magnetic north while the wind direction was reported in true north, the arrow could be off by 10–20 degrees depending on where you are in the world—enough to make the "Plays Like" calculation misleading.
+This matters because wind data from OpenWeatherMap is relative to true north. If the compass showed magnetic north while the wind direction was reported in true north, the arrow could be off by 10–20 degrees depending on where you are in the world. Which is enough to make the "Plays Like" calculation misleading.
 
 ---
 
@@ -104,16 +100,7 @@ Open `CaddieWind.xcodeproj` in Xcode, select your target device or simulator, an
 
 ## A Note on This Project
 
-This was my **first iOS/Swift project**. I built it to solve a real problem I had on the golf course—trying to feel the wind and guess how it would affect my club selection. Building CaddieWind taught me how to bridge SwiftUI state with CoreLocation, handle REST API decoding, and deal with the subtle edge cases of compass UI animation. There's plenty I'd refactor now, but it works, and it genuinely helps me play better golf.
-
----
-
-## TODO / Ideas
-- [ ] Add a screenshot/GIF to the README
-- [ ] Support gust speed (OpenWeatherMap provides `wind.gust`)
-- [ ] Local weather caching so the compass works briefly offline
-- [ ] Apple Watch complication for quick wind glances
-- [ ] Unit tests for `WindCalculator` edge cases
+This was my **first iOS/Swift project**. I built it to solve a real problem I had on the golf course—trying to feel the wind and guess how it would affect my club selection. Building CaddieWind taught me how to bridge SwiftUI state with CoreLocation, handle REST API decoding, and deal with the subtle edge cases of compass UI animation. There's plenty I'd refactor now, but it works, and it genuinely helps me play better golf and it's fun to use and watch my family use when we're out there playing.
 
 ---
 
