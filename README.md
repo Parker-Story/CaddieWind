@@ -2,7 +2,9 @@
 
 > A lightweight iOS compass that shows real-time wind direction and speed for golfers.
 
-https://github.com/user-attachments/assets/027941eb-6a17-4c80-a2d3-96abf4fe8c69
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/027941eb-6a17-4c80-a2d3-96abf4fe8c69" width="400" />
+</p>
 
 ---
 
