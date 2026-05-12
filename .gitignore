@@ -22,5 +22,10 @@ Thumbs.db
 .swiftpm/
 Packages/
 
+# Node
+node_modules/
+package.json
+package-lock.json
+
 # Secrets — real API keys live here, never commit
 /Config.swift
